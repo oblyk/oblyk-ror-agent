@@ -27,7 +27,10 @@ Follow RoRVsWild instruction : https://github.com/BaseSecrete/rorvswild
 
 Installing the minimum for rails to work :
 - sqlite3 (`apt install sqlite3`)
-- ruby (preferably with rbenv? https://github.com/rbenv/rbenv) version 3.2.1 for this project
+- ruby (preferably with rbenv? https://github.com/rbenv/rbenv) version 3.2.1 for this project _(problem ? see troubleshooting 1)_
+- bundler 
+
+**Tips :** for install rbenv and bundler follow this guide : https://www.digitalocean.com/community/tutorials/how-to-install-ruby-on-rails-with-rbenv-on-debian-8 until `gem install bundler`
 
 Clone oblyk-ror-agent on your server :
 ```shell
@@ -35,20 +38,64 @@ cd /path/to/your/applications
 git clone https://github.com/oblyk/oblyk-ror-agent.git
 ```
 
-install gem
+Install gem
 ```shell
 bundle
 ```
+_(problem ? see troubleshooting 2)_
+
+Copy local_env.example.yml
+```shell
+cp config/local_env.example.yml config/local_env.yml
+nano config/local_env.yml
+# enter your RorVsWild key
+```
+
+Create your `config/master.key` file
+
+test if it works :
+```shell
+RAILS_ENV=production bundle exec rails s
+```
+Go to your RorVsWild back office, tab : server  
+Your data influx?
 
 ## Start or kill app
 
-For start app :
+Run your application in background with nohup :
 ```shell
 cd /your/app/folfer/
-RAILS_ENV=production bundle exec rails server --daemon
+RAILS_ENV=production nohup bundle exec rails s &
+```
+
+**Note** : for some reason running server rails in --daemon mode does not work
+
+Check that your app is running
+```shell
+ps -aux | grep puma
 ```
 
 to kill app :
 ```shell
 kill `cat /your/app/folfer/tmp/pids/server.pid`
+```
+
+## Troubleshooting
+
+### 1. Problem installing ruby version
+
+If installing a ruby version takes a long time and blocks on 'install openssl ...'  
+Try installing `libssl-dev`
+```shell
+sudo apt-get install libssl-dev
+```
+
+### 2. Problem installing pschy when install gem
+
+If you get this error when installing gems :  
+> An error occurred while installing psych (5.1.0), and Bundler cannot continue.
+
+Try installing `libyaml-dev`
+```shell
+sudo apt-get install libyaml-dev
 ```
